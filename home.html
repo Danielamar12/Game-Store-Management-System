@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}דף הבית{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <h1>ברוך הבא, {{ session['full_name'] }}!</h1>
+    <div class="welcome-content">
+        <p class="welcome-text">שמחים לראות אותך כאן</p>
+        <div class="user-info">
+            <p><strong>שם מלא:</strong> {{ session['full_name'] }}</p>
+            <p><strong>אימייל:</strong> {{ session['email'] }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

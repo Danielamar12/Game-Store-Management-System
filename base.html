@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">הלוגו שלך</a>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> דף הבית</a></li>
+                <li><a href="{{ url_for('settings') }}"><i class="fas fa-user-cog"></i> הגדרות</a></li>
+                {% if session.get('is_admin') %}
+                    <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-users-cog"></i> ניהול</a></li>
+                {% endif %}
+            </ul>
+            
+            <div class="nav-user">
+                <span class="user-name"><i class="fas fa-user-circle"></i> {{ session['full_name'] }}</span>
+                <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> התנתק</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

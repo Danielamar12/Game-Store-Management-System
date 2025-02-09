@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}הגדרות משתמש{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <h1>הגדרות משתמש</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="user-details">
+        <div class="details-section">
+            <h2>פרטים אישיים</h2>
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-user"></i> שם מלא:</span>
+                <span class="detail-value">{{ user.full_name }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-envelope"></i> אימייל:</span>
+                <span class="detail-value">{{ user.email }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-phone"></i> טלפון:</span>
+                <span class="detail-value">{{ user.phone }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-user-shield"></i> סוג משתמש:</span>
+                <span class="detail-value">{{ "מנהל" if user.is_admin else "משתמש רגיל" }}</span>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <h2>עדכון פרטים</h2>
+            <form method="POST" action="{{ url_for('update_settings') }}" class="settings-form">
+                <div class="form-group">
+                    <label for="full_name">שם מלא:</label>
+                    <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">טלפון:</label>
+                    <input type="tel" id="phone" name="phone" value="{{ user.phone }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="current_password">סיסמה נוכחית:</label>
+                    <input type="password" id="current_password" name="current_password">
+                </div>
+                <div class="form-group">
+                    <label for="new_password">סיסמה חדשה:</label>
+                    <input type="password" id="new_password" name="new_password">
+                </div>
+                <button type="submit" class="btn-update">עדכן פרטים</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

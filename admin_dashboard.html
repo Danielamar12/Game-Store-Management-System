@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}פאנל ניהול{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- טאבים לניווט -->
+    <div class="admin-tabs">
+        <button class="tab-btn active" onclick="showTab('games')">ניהול משחקים</button>
+        <button class="tab-btn" onclick="showTab('users')">ניהול משתמשים</button>
+    </div>
+
+    <!-- טאב משחקים -->
+    <div id="games-tab" class="tab-content active">
+        <div class="add-game-section">
+            <h2>הוספת משחק חדש</h2>
+            <form id="add-game-form" class="admin-form">
+                <div class="form-group">
+                    <label for="title">שם המשחק:</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="genre">ז'אנר:</label>
+                    <select id="genre" name="genre" required>
+                        <option value="">בחר ז'אנר</option>
+                        <option value="action">אקשן</option>
+                        <option value="adventure">הרפתקאות</option>
+                        <option value="rpg">RPG</option>
+                        <option value="sports">ספורט</option>
+                        <option value="strategy">אסטרטגיה</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="price">מחיר:</label>
+                    <input type="number" id="price" name="price" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">כמות במלאי:</label>
+                    <input type="number" id="quantity" name="quantity" min="0" required>
+                </div>
+                <button type="submit" class="btn-submit">הוסף משחק</button>
+            </form>
+        </div>
+
+        <div class="games-list">
+            <h2>רשימת משחקים</h2>
+            <table id="games-table">
+                <thead>
+                    <tr>
+                        <th>שם המשחק</th>
+                        <th>ז'אנר</th>
+                        <th>מחיר</th>
+                        <th>כמות</th>
+                        <th>סטטוס</th>
+                        <th>פעולות</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- הטבלה תמולא דרך JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- טאב משתמשים (הקיים) -->
+    <div id="users-tab" class="tab-content">
+        <!-- תוכן קיים של ניהול משתמשים -->
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+// פונקציות JavaScript לניהול הטאבים
+function showTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+    document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
+}
+
+// טעינת רשימת המשחקים
+async function loadGames() {
+    try {
+        const response = await axios.get('/api/games');
+        const gamesTable = document.querySelector('#games-table tbody');
+        gamesTable.innerHTML = '';
+        
+        response.data.forEach(game => {
+            const row = `
+                <tr>
+                    <td>${game.title}</td>
+                    <td>${game.genre}</td>
+                    <td>${game.price}₪</td>
+                    <td>${game.quantity}</td>
+                    <td>${game.is_loaned ? 'מושאל' : 'זמין'}</td>
+                    <td>
+                        <button onclick="deleteGame(${game.id})" class="btn-delete">מחק</button>
+                    </td>
+                </tr>
+            `;
+            gamesTable.innerHTML += row;
+        });
+    } catch (error) {
+        console.error('Error loading games:', error);
+        alert('אירעה שגיאה בטעינת המשחקים');
+    }
+}
+
+// הוספת משחק חדש
+document.getElementById('add-game-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        title: document.getElementById('title').value,
+        genre: document.getElementById('genre').value,
+        price: document.getElementById('price').value,
+        quantity: document.getElementById('quantity').value
+    };
+
+    try {
+        await axios.post('/api/games', formData);
+        alert('המשחק נוסף בהצלחה!');
+        document.getElementById('add-game-form').reset();
+        loadGames();
+    } catch (error) {
+        console.error('Error adding game:', error);
+        alert('אירעה שגיאה בהוספת המשחק');
+    }
+});
+
+// מחיקת משחק
+async function deleteGame(gameId) {
+    if (confirm('האם אתה בטוח שברצונך למחוק משחק זה?')) {
+        try {
+            await axios.delete(`/api/games/${gameId}`);
+            alert('המשחק נמחק בהצלחה!');
+            loadGames();
+        } catch (error) {
+            console.error('Error deleting game:', error);
+            alert('אירעה שגיאה במחיקת המשחק');
+        }
+    }
+}
+
+// טעינת המשחקים בטעינת העמוד
+document.addEventListener('DOMContentLoaded', loadGames);
+</script>
+{% endblock %} 
